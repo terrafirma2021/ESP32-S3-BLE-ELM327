@@ -58,9 +58,14 @@ public:
     }
 
     void onConnect(BLEServer*) override {
-        clientConnected = true;
-        Serial.println("Device connected");
-    }
+    clientConnected = true;
+    Serial.println("Device connected");
+
+    // Set handleATSCommand and handleATHCommand to false when connected
+    Device::getInstance().handleATSCommand = false;
+    Device::getInstance().handleATHCommand = false;
+    Serial.println("AT Commands Reset");
+}
 
     void onDisconnect(BLEServer*) override {
         clientConnected = false;
@@ -68,7 +73,8 @@ public:
         BLEDevice::startAdvertising();
     }
 
-    bool headersOn = false;  // State variable for header
+    bool handleATHCommand = false;
+    bool handleATSCommand = false;
 
 private:
     Device() noexcept
@@ -127,67 +133,69 @@ public:
         std::string command((char*)(value + start), len - start);
 
         // Handle commands here using a map or switch-case for better organization
-        handleCommand(command);
+        std::string response = handleCommand(command);
+
+        // Send a carriage return to indicate readiness for the next command
+        sendResponse(response + "\r>");
     }
 
 private:
-void handleCommand(const std::string& command) {
-    std::string response;
-
-    if (command == "ATI") {
-        response = "ELM327 v2.1";
-        Device::getInstance().headersOn = false;
-    } else if (command == "ATZ" || command == "AT@1") {
-        response = "ELM327 v2.1";
-    } else if (command == "ATE0" || command == "ATPC" || command == "ATM0" ||
-               command == "ATL0" || command == "ATST62" || command == "ATS0" ||
-               command == "ATSP0" || command == "ATAT1" || command == "ATAT2" ||
-               command == "ATSPA5") {
-        response = "OK";
-    } else if (command == "ATH1" || command == "AT H1") {
-        handleATHCommand(true);  // Turn headers off
-        response = "OK";
-    } else if (command == "ATH0" || command == "AT H0") {
-        handleATHCommand(false);  // Turn headers on
-        response = "OK";
-    } else if (command == "ATDPN") {
-        response = "0";
-    } else if (command == "0100") {
-        response = "41 00 05 0D A4";
-    } else if (command == "0120") {
-        response = "41 20 NO DATA";
-    } else if (command == "010D") {
-        response = "41 0D 64";
-    } else if (command == "0111") {
-        response = "41 00";
-    } else {
-        response = "Unknown command or length mismatch. Received: " + command;
+    std::string handleCommand(const std::string& command) {
+        std::string response;
+        if (command == "ATI" || command == "AT@1") {
+            response = "ELM327 v2.1";
+        } else if (command == "ATS1" || command == "AT S1") {
+            Device::getInstance().handleATSCommand = false;   // Turn Spaces On
+            response = "OK";
+        } else if (command == "ATS0" || command == "AT S0") {
+            Device::getInstance().handleATSCommand = true;    // Turn Spaces Off
+            response = "OK";
+        } else if (command == "ATH1" || command == "AT H1") {
+            response = "OK";
+            Device::getInstance().handleATHCommand = true;    // Turn Headers On
+        } else if (command == "ATH0" || command == "AT H0") {
+            Device::getInstance().handleATHCommand = false;   // Turn Headers Off
+            response = "OK";
+        } else if (command == "ATZ") {                        // Simulate a ELM327 Reset
+            Device::getInstance().handleATHCommand = false;
+            Device::getInstance().handleATSCommand = false;
+            response = "OK";
+        } else if (command == "ATE0" || command == "ATPC" || command == "ATM0" ||
+            command == "ATL0" || command == "ATST62" || command == "ATSP0" ||
+            command == "ATSP0" || command == "ATAT1" || command == "ATAT2" ||
+            command == "ATAT2" || command == "ATSPA5") {
+            response = "OK";
+        } else if (command == "ATDPN") {
+            response = "5"; // Protocol Number
+        } else if (command == "0100") {
+            response = "41 00 05 0D A4"; // Fake PID Response
+        } else if (command == "0120") {
+            response = "41 20 NO DATA";
+        } else if (command == "010D") {
+            response = "41 0D 64";       // Speed
+        } else if (command == "0111") {
+            response = "41 00";          // Shouldn't be called
+        } else {
+            Serial.println(("Unknown command or length mismatch. Received: " + command).c_str());
+        }
+        return response;
     }
 
-    // Send a carriage return to indicate readiness for the next command
-    sendResponse(response + "\r"); 
-      
-    return;
-
-}
-
-
-
+    // Need to tidy up SendResponse
     void sendResponse(const std::string& response) {
-        // Create a new string by appending ">" to the response after '\r'
-        std::string responseWithModifiedCR = response;
-        size_t pos = responseWithModifiedCR.find_last_of('\r');
-        if (pos != std::string::npos) {
-            responseWithModifiedCR.insert(pos + 1, ">");
+        std::string finalResponse = response;
+
+        if (Device::getInstance().handleATSCommand && Device::getInstance().handleATHCommand) {
+            finalResponse.insert(0, "7E8 04 "); // Simulated Header output is wrong for Protocol 5, TO FIX
+            finalResponse.erase(std::remove(finalResponse.begin(), finalResponse.end(), ' '), finalResponse.end());
+        } else if (Device::getInstance().handleATSCommand) {
+            finalResponse.erase(std::remove(finalResponse.begin(), finalResponse.end(), ' '), finalResponse.end());
+        } else if (Device::getInstance().handleATHCommand) {
+            finalResponse.insert(0, "7E8 04 "); // Simulated Header output is wrong for Protocol 5, TO FIX
         }
 
-        // Send the modified response
-        elm327::Device::getInstance().send(responseWithModifiedCR.c_str());
-    }
-
-    void handleATHCommand(bool state) {
-        elm327::Device::getInstance().headersOn = state;
-        sendResponse("OK");
+        // Send the final response
+        elm327::Device::getInstance().send(finalResponse.c_str());
     }
 };
 
@@ -196,14 +204,12 @@ void handleCommand(const std::string& command) {
 void setup() {
     Serial.begin(115200);
     elm327::MyCallbacks* myCallbacks = new elm327::MyCallbacks();
-    if (elm327::Device::getInstance().start(myCallbacks)) {
-        Serial.println("BLE startup successful.");
-    } else {
-        Serial.println("ERROR: BLE startup failed!");
-        esp_restart();
+    bool success = elm327::Device::getInstance().start(myCallbacks);
+    if (!success) {
+        Serial.println("Failed to start BLE");
     }
 }
 
 void loop() {
-    
+
 }
