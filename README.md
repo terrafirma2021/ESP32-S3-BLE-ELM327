@@ -20,8 +20,8 @@ This project aims to create an ESP32_S3-based ELM327 emulator that operates usin
 ## TODO List
 
 - Implement additional AT commands to resolve any existing errors.
-- Add a switch to control headers in communication.
-- Add a switch to remove spaces from responses.
+- Add a switch to control headers in communication. Done
+- Add a switch to remove spaces from responses. Done
 - Integrate live data from the L9637D for enhanced functionality.
 
 ## Contributing
