@@ -160,7 +160,7 @@ private:
       Device::getInstance().handleATHCommand = false;
       Device::getInstance().setATH1Active(false);  // Reset ATH1 active
       response = "OK";
-    } else if (command == "ATZ") {
+    } else if (command == "ATZ") {  // Reset
       Device::getInstance().handleATHCommand = false;
       Device::getInstance().setATH1Active(false);
       Device::getInstance().handleATSCommand = false;
@@ -168,24 +168,46 @@ private:
     } else if (command == "ATE0" || command == "ATPC" || command == "ATM0" ||
       command == "ATL0" || command == "ATST62" || command == "ATSP0" ||
       command == "ATSP0" || command == "ATAT1" || command == "ATAT2" ||
-      command == "ATAT2" || command == "ATSPA5") {
+      command == "ATAT2" || command == "ATSP6" ||command == "ATSPA6") {
       response = "OK";
     } else if (command == "ATDPN") {
-      response = "5"; // Protocol Number
+      response = "6"; // Protocol Number 6 CAN bus
+    } else if (command == "0113") {    // Engine RPM
+      response = "41 13 44";
+    } else if (command == "0151") {    // Vehicle Speed
+      response = "41 51 55";
+    } else if (command == "011C") {    // Throttle Position
+      response = "41 1C 22";      
+    } else if (command == "01009") {
+      response = "41 09 NO DATA";  // ???
+    } else if (command == "0902") {
+      response = "49 02 00";  // VIN ???
+    } else if (command == "0904") {
+      response = "49 04 00";  // ???
+    } else if (command == "090A") {
+      response = "49 0A 00";  // ??? 
     } else if (command == "0100") {
-      response = "41 00 05 0D A4"; // Fake PID Response
-    } else if (command == "0120") {
-      response = "41 20 NO DATA";
+      response = "41 00 05 0D A4"; // Fake PID's Supported
+    } else if (command == "0133") {
+      response = "41 33 BC";  // Engine Coolant Temperature
     } else if (command == "010B") {
-      response = "41 00 OB 45";  // Coolant temp
+      response = "41 0B 45";  // Intake Air Temperature
     } else if (command == "010C") {
-      response = "41 00 0C 64";  // Speed
+      response = "41 0C 64";  // RPM
     } else if (command == "010D") {
-      response = "41 00 0D 64";  // Speed
+      response = "41 0D 64";  // Vehicle Speed
+    } else if (command == "0105") {
+      response = "41 05 64";  // Engine Coolant Temperature
+    } else if (command == "0111") {
+      response = "41 11 64";  // Throttle Position
+    } else if (command == "0143") {
+      response = "41 43 64";  // Intake Air Temperature
+    } else if (command == "0166") {
+      response = "41 66 64";  // Engine Load
+    } else if (command == "0146") {
+      response = "41 46 64";  // Ambient Air Temperature
     } else if (command == "0110") {
-      response = "41 00 10 63";  // Speed
-    } else if (command == "0113") {    // vin Number Request
-      response = "41 00 13 40";
+      response = "41 10 FF";  // MAF (Mass Air Flow) Air Flow Rate
     } else {
 #if DEBUG_LEVEL >= 1
       Serial.println(("Unknown command or length mismatch. Received: " + command).c_str());
@@ -193,6 +215,7 @@ private:
     }
     return response;
   }
+
 
   std::string sendResponse(const std::string& command, const std::string& response) {
     Device& device = Device::getInstance();
