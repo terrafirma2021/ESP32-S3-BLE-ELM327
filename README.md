@@ -1,14 +1,14 @@
-## ESP32_S3 ELM327 Emulator for KWP2000 Protocol
+## ESP32_S3 ELM327 Emulator for Can Bus
 
 **Work in Progress (WIP) - Early Basic Implementation**
 
-This project aims to create an ESP32_S3-based ELM327 emulator that operates using the KWP2000 protocol. The goal is to simulate an ELM327 device without the need for a separate physical ELM327 device. This implementation is designed primarily for use with motorcycles, focusing on KWP2000 rather than CAN bus communication. However, it can be adapted for other applications if necessary.
+This project aims to create an ESP32_S3-based ELM327 emulator that operates using the Can protocol. The goal is to simulate an ELM327 device without the need for a separate physical ELM327 device. This implementation is designed primarily for use with motorcycles, focusing on KWP2000 rather than CAN bus communication. However, it can be adapted for other applications if necessary.
 
 ## Features
 
 - Emulates an ELM327 device using ESP32_S3.
-- Supports the KWP2000 protocol.
-- Integration with Torque app to display MPH.
+- Supports the Can protocol.
+- Integration with Torque app to display Multiple PIDS.
 
 ## Usage
 
