@@ -14,7 +14,7 @@ This project aims to create an ESP32_S3-based ELM327 emulator that operates usin
 
 1. Upload this code to your ESP32_S3 board.
 2. Connect your smartphone or Torque app to the ESP32_S3 over Bluetooth.
-3. Use compatible KWP2000 commands to interact with your vehicle's data.
+3. Use compatible Can Bus commands to interact with your vehicle's data.
 4. View vehicle information and data on the Torque app.
 
 ## TODO List
