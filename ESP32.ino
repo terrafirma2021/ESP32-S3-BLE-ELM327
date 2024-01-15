@@ -172,42 +172,58 @@ private:
       response = "OK";
     } else if (command == "ATDPN") {
       response = "6"; // Protocol Number 6 CAN bus
-    } else if (command == "0113") {    // Engine RPM
-      response = "41 13 44";
-    } else if (command == "0151") {    // Vehicle Speed
-      response = "41 51 55";
-    } else if (command == "011C") {    // Throttle Position
-      response = "41 1C 22";      
-    } else if (command == "01009") {
-      response = "41 09 NO DATA";  // ???
-    } else if (command == "0902") {
-      response = "49 02 00";  // VIN ???
-    } else if (command == "0904") {
-      response = "49 04 00";  // ???
-    } else if (command == "090A") {
-      response = "49 0A 00";  // ??? 
-    } else if (command == "0100") {
-      response = "41 00 05 0D A4"; // Fake PID's Supported
-    } else if (command == "0133") {
-      response = "41 33 BC";  // Engine Coolant Temperature
-    } else if (command == "010B") {
-      response = "41 0B 45";  // Intake Air Temperature
-    } else if (command == "010C") {
-      response = "41 0C 64";  // RPM
-    } else if (command == "010D") {
-      response = "41 0D 64";  // Vehicle Speed
-    } else if (command == "0105") {
-      response = "41 05 64";  // Engine Coolant Temperature
-    } else if (command == "0111") {
-      response = "41 11 64";  // Throttle Position
-    } else if (command == "0143") {
-      response = "41 43 64";  // Intake Air Temperature
-    } else if (command == "0166") {
-      response = "41 66 64";  // Engine Load
-    } else if (command == "0146") {
-      response = "41 46 64";  // Ambient Air Temperature
-    } else if (command == "0110") {
-      response = "41 10 FF";  // MAF (Mass Air Flow) Air Flow Rate
+    } else if (command == "0100") { // PID 1 - Supported PIDs [01-20]
+      response = "41 00 04 1C D0 08 00";
+    } else if (command == "0120") { // PID 2 - Supported PIDs [21-40]
+      response = "41 20 00 00 10 00 00";
+    } else if (command == "0140") { // PID 3 - Supported PIDs [41-60]
+      response = "41 40 12 00 40 00 00";
+    } else if (command == "0160") { // PID 4 - Supported PIDs [61-80]
+      response = "41 60 02 00 00 00 00";
+    } else if (command == "0180") { // PID 5 - Supported PIDs [81-A0]
+      response = "41 80 NO DATA";
+    } else if (command == "01A0") { // PID 6 - Supported PIDs [A1-C0]
+      response = "41 A0 NO DATA";
+    } else if (command == "01C0") { // PID 7 - Supported PIDs [C1-E0]
+      response = "41 C0 NO DATA";
+    
+    // Handle PID Requests
+    } else if (command == "0105") { // Engine Coolant Temperature (PID 0105)
+      response = "41 05 64";  
+    } else if (command == "0109") { // Long term fuel trim (PID 0109)
+      response = "41 09 34"; 
+    } else if (command == "010B") { // Intake Air Temperature (PID 010B)
+      response = "41 0B 45";  
+    } else if (command == "010C") { // RPM (PID 010C)
+      response = "41 0C 64";  
+    } else if (command == "010D") { // Vehicle Speed (PID 010D)
+      response = "41 0D 64";  
+    } else if (command == "0110") { // MAF (Mass Air Flow) Air Flow Rate (PID 0110)
+      response = "41 10 FF";  
+    } else if (command == "0111") { // Throttle Position (PID 0111)
+      response = "41 11 64";  
+    } else if (command == "0113") { // Engine RPM (PID 0113)
+      response = "41 13 44";  
+    } else if (command == "011C") { // Throttle Position (PID 011C)
+      response = "41 1C 22";  
+    } else if (command == "0133") { // Engine Coolant Temperature (PID 0133)
+      response = "41 33 BC";  
+    } else if (command == "0143") { // Intake Air Temperature (PID 0143)
+      response = "41 43 64";  
+    } else if (command == "0146") {  // Ambient Air Temperature (PID 0146)
+      response = "41 46 64"; 
+    } else if (command == "0151") { // Vehicle Speed (PID 0151)
+      response = "41 51 55";  
+    } else if (command == "0166") { // Engine Load (PID 0166)
+      response = "41 66 64";  
+    } else if (command == "0902") {  // VIN (PID 0902)
+      response = "49 02 00 00 59 41 4D 41 48 41 45 53 50 33 32 4F 44 42"; 
+    } else if (command == "0904") { // Calibration ID (PID 0904)
+      response = "49 04 00 00 00 00";
+    } else if (command == "090A") { // ECU Name (PID 090A)
+      response = "49 0A 10 10 10 12";
+      } else if (command == "01009") { // ???
+      response = "41 009 NO DATA";
     } else {
 #if DEBUG_LEVEL >= 1
       Serial.println(("Unknown command or length mismatch. Received: " + command).c_str());
@@ -215,7 +231,6 @@ private:
     }
     return response;
   }
-
 
   std::string sendResponse(const std::string& command, const std::string& response) {
     Device& device = Device::getInstance();
