@@ -6,15 +6,15 @@ This project aims to create an ESP32_S3 BLE ELM327 emulator that operates using 
 
 - Emulates an ELM327 device using ESP32_S3.
 - Supports the Can protocol.
-- Integration with Torque app to display Multiple PIDS.
+- Plug-n-play integration with Torque pro and Realdash to display Multiple PIDS.
 - Fake data sent to simulate connection to ECU
 - Uses BLE
 
 ## Usage
 
 1. Upload this code to your ESP32_S3 board.
-2. Connect your smartphone or Torque app to the ESP32_S3 over Bluetooth.
-3. View vehicle information and data on the Torque app.
+2. Connect your smartphone via BLE.
+3. View vehicle information and data on Torque, Realdash, racechono app.
 
 ## Contributing
 
