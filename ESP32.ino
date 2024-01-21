@@ -121,6 +121,11 @@ public:
       len--;
     }
 
+    // Convert data to uppercase
+    for (size_t i = start; i < len; i++) {
+      value[i] = toupper(value[i]);
+    }
+
 #if DEBUG_LEVEL >= 1
     Serial.print("Received: ");
     Serial.write(value + start, len - start);
@@ -172,14 +177,18 @@ private:
       response = "OK";
     } else if (command == "ATDPN") {
       response = "6"; // Protocol Number 6 CAN bus
+    } else if (command == "ATD") {
+      response = "OK"; // RealDash Reset to Defaults
+    } else if (command == "ATRV") {
+      response = "14.4V"; // Voltage Request
     } else if (command == "0100") { // PID 1 - Supported PIDs [01-20]
-      response = "41 00 04 1C D0 08 00";
+      response = "41 00 0C BD B0 11";
     } else if (command == "0120") { // PID 2 - Supported PIDs [21-40]
-      response = "41 20 00 00 10 00 00";
+      response = "41 20 00 00 30 01";
     } else if (command == "0140") { // PID 3 - Supported PIDs [41-60]
-      response = "41 40 12 00 40 00 00";
+      response = "41 40 24 00 80 11";
     } else if (command == "0160") { // PID 4 - Supported PIDs [61-80]
-      response = "41 60 02 00 00 00 00";
+      response = "41 60 04 00 00 01";
     } else if (command == "0180") { // PID 5 - Supported PIDs [81-A0]
       response = "41 80 NO DATA";
     } else if (command == "01A0") { // PID 6 - Supported PIDs [A1-C0]
@@ -189,7 +198,17 @@ private:
     
     // Handle PID Requests
     } else if (command == "0105") { // Engine Coolant Temperature (PID 0105)
-      response = "41 05 64";  
+      response = "41 05 64";
+      } else if (command == "0106") { // Short term fuel trim (STFT)—Bank 1 (PID 0106)
+      response = "41 06 64";
+      } else if (command == "015C") { // Engine Coolant Temperature (PID 0105)
+      response = "41 5C 64";
+    } else if (command == "010E") { // Timing advance (PID 010E)
+      response = "41 0E 23";
+    } else if (command == "0114") { // Oxygen Sensor 1 A: Voltage B: Short Term Fuel Trim Short term fuel trim (STFT)—Bank 1 (PID 0114)
+      response = "41 14 23";
+    } else if (command == "0134") { // Oxygen Sensor 1 Oxygen Sensor 1 AB: Air-Fuel Equivalence Ratio (lambda,λ) CD: Current (PID 0134)
+      response = "41 34 14 14";  
     } else if (command == "0109") { // Long term fuel trim (PID 0109)
       response = "41 09 34"; 
     } else if (command == "010B") { // Intake Air Temperature (PID 010B)
