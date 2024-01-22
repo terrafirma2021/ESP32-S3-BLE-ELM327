@@ -188,7 +188,7 @@ private:
     } else if (command == "0140") { // PID 3 - Supported PIDs [41-60]
       response = "41 40 24 00 80 11";
     } else if (command == "0160") { // PID 4 - Supported PIDs [61-80]
-      response = "41 60 04 00 00 01";
+      response = "41 60 04 00 00 00";
     } else if (command == "0180") { // PID 5 - Supported PIDs [81-A0]
       response = "41 80 NO DATA";
     } else if (command == "01A0") { // PID 6 - Supported PIDs [A1-C0]
