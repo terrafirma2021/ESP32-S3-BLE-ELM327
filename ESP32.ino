@@ -28,7 +28,7 @@ public:
   }
 
   bool start(BLECharacteristicCallbacks* callbacks) noexcept {
-    BLEDevice::init("Carista");
+    BLEDevice::init("OBDII");  // changed from "Carista"
     BLEDevice::setPower(ESP_PWR_LVL_P9);
 
     server = BLEDevice::createServer();
